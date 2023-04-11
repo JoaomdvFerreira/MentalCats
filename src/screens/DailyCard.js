@@ -1,17 +1,17 @@
 import React, { useState, useEffect } from 'react';
-import {
-  View,
-  Text,
-  Image,
-  TouchableOpacity,
-  StyleSheet,
-  Share,
-} from 'react-native';
+import { View, Text, Image, TouchableOpacity, Share } from 'react-native';
+
+import { dailyCardStyles } from '../styles/dailyCardStyles';
+
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-import { firestore, storage } from '../config/firebaseConfig';
-import { collection, getDocs } from 'firebase/firestore';
-import { ref, listAll, getDownloadURL } from 'firebase/storage';
+import {
+  fetchCatImages,
+  fetchPsychologicalMessages,
+} from '../utils/firebaseApi';
+import { generateDailyCard } from '../utils/dailyCardGenerator';
+
+import Ionicons from 'react-native-vector-icons/Ionicons';
 
 const DailyCard = ({ navigation }) => {
   const [card, setCard] = useState(null);
@@ -28,12 +28,6 @@ const DailyCard = ({ navigation }) => {
 
         setCatImages(catImagesData);
         setPsychologicalMessages(psychologicalMessagesData);
-
-        if (catImagesData.length > 0 && psychologicalMessagesData.length > 0) {
-          generateRandomCard(catImagesData, psychologicalMessagesData);
-        } else {
-          console.log('No data found');
-        }
       } catch (error) {
         console.error('Error initializing data:', error);
       }
@@ -44,75 +38,25 @@ const DailyCard = ({ navigation }) => {
 
   useEffect(() => {
     if (catImages.length > 0 && psychologicalMessages.length > 0) {
-      generateRandomCard(catImages, psychologicalMessages);
+      const newCard = generateDailyCard(catImages, psychologicalMessages);
+      if (newCard) {
+        setCard((prevCard) => {
+          if (
+            prevCard === null ||
+            prevCard.image.uri !== newCard.image.uri ||
+            prevCard.message.title !== newCard.message.title ||
+            prevCard.message.message !== newCard.message.message
+          ) {
+            return newCard;
+          }
+
+          return prevCard;
+        });
+      } else {
+        console.warn('Failed to generate a new daily card');
+      }
     }
   }, [catImages, psychologicalMessages]);
-
-  const fetchPsychologicalMessages = async () => {
-    try {
-      const querySnapshot = await getDocs(
-        collection(firestore, 'psychologicalMessages')
-      );
-      const messages = querySnapshot.docs.map((doc) => doc.data());
-      return messages;
-    } catch (error) {
-      console.error('Error fetching psychological messages:', error);
-    }
-    return [];
-  };
-
-  const fetchCatImages = async () => {
-    try {
-      const listResult = await listAll(ref(storage, 'catImages'));
-
-      if (listResult.items.length === 0) {
-        console.log('No cat images found in storage');
-      }
-
-      const imageUrls = await Promise.all(
-        listResult.items.map(async (item) => {
-          const url = await getDownloadURL(item);
-          return { id: item.name, uri: url };
-        })
-      );
-      return imageUrls;
-    } catch (error) {
-      console.error('Error fetching cat images:', error);
-    }
-    return [];
-  };
-
-  const generateRandomCard = (catImagesData, psychologicalMessagesData) => {
-    if (catImagesData.length === 0 || psychologicalMessagesData.length === 0) {
-      console.warn('No cat images or psychological messages found.');
-      return;
-    }
-
-    const randomIndex = Math.floor(Math.random() * catImagesData.length);
-    const randomImage = catImagesData[randomIndex];
-    const randomMessage =
-      psychologicalMessagesData[
-        Math.floor(Math.random() * psychologicalMessagesData.length)
-      ];
-
-    setCard((prevCard) => {
-      const newCard = {
-        image: { id: randomIndex + 1, uri: randomImage.uri },
-        message: { title: randomMessage.title, message: randomMessage.message },
-      };
-
-      if (
-        prevCard === null ||
-        prevCard.image.uri !== newCard.image.uri ||
-        prevCard.message.title !== newCard.message.title ||
-        prevCard.message.message !== newCard.message.message
-      ) {
-        return newCard;
-      }
-
-      return prevCard;
-    });
-  };
 
   const saveToFavorites = async () => {
     if (!card) return;
@@ -128,68 +72,41 @@ const DailyCard = ({ navigation }) => {
     }
   };
 
-  const shareCard = async () => {
-    if (!card) return;
-
-    try {
-      const baseUrl = 'https://mentalcats.com/share';
-      const encodedImageUri = encodeURIComponent(card.image);
-      const encodedMessage = encodeURIComponent(card.message);
-      const shareUrl = `${baseUrl}?image=${encodedImageUri}&message=${encodedMessage}`;
-
-      await Share.share({
-        title: 'Awesome Cat',
-        url: shareUrl,
-        message: `Check out this awesome cat: ${shareUrl}`,
-      });
-    } catch (err) {
-      console.error('Error sharing card:', err);
-    }
-  };
-
   if (!card) {
     return (
-      <View style={styles.container}>
+      <View style={dailyCardStyles.container}>
         <Text>Loading...</Text>
       </View>
     );
   }
 
   return (
-    <View style={styles.container}>
-      <Image source={{ uri: card.image.uri }} style={styles.image} />
-      <Text style={styles.message}>{card.message.title}</Text>
-      <Text style={styles.message}>{card.message.message}</Text>
-      <View style={styles.buttonContainer}>
-        <TouchableOpacity style={styles.button} onPress={saveToFavorites}>
-          <Text style={styles.buttonText}>Save to Favorites</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.button} onPress={shareCard}>
-          <Text style={styles.buttonText}>Share</Text>
+    <>
+      <View style={dailyCardStyles.container}>
+        <View style={dailyCardStyles.card}>
+          <View style={dailyCardStyles.imageContainer}>
+            <Image
+              source={{ uri: card.image.uri }}
+              style={dailyCardStyles.image}
+            />
+          </View>
+          <View>
+            <Text style={dailyCardStyles.messageTitle}>
+              {card.message.title}
+            </Text>
+            <Text style={dailyCardStyles.message}>{card.message.message}</Text>
+          </View>
+          <Text style={dailyCardStyles.photoOwner}>
+            Photo by Jeremy Bishop on Unsplash
+          </Text>
+        </View>
+
+        <TouchableOpacity onPress={saveToFavorites}>
+          <Ionicons name="heart-outline" size={24} color="#00f" />
         </TouchableOpacity>
       </View>
-    </View>
+    </>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 20,
-  },
-  image: { width: '100%', height: 300, resizeMode: 'cover', marginBottom: 20 },
-  message: { fontSize: 18, textAlign: 'center', marginBottom: 20 },
-  buttonContainer: { flexDirection: 'row' },
-  button: {
-    backgroundColor: '#00f',
-    paddingHorizontal: 20,
-    paddingVertical: 10,
-    borderRadius: 5,
-    margin: 5,
-  },
-  buttonText: { color: '#fff', fontWeight: 'bold' },
-});
 
 export default DailyCard;

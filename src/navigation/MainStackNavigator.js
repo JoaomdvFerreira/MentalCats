@@ -9,7 +9,7 @@ import Detail from '../screens/Detail';
 
 const Stack = createStackNavigator();
 
-const MainStackNavigator = () => {
+const MainStackNavigator = ({ user }) => {
   return (
     <Stack.Navigator initialRouteName="SignUp">
       <Stack.Screen
@@ -25,7 +25,10 @@ const MainStackNavigator = () => {
       <Stack.Screen
         name="DailyCard"
         component={DailyCard}
-        options={{ title: 'Daily Card' }}
+        options={{
+          title: 'Daily Card',
+          headerLeft: () => (user ? null : undefined),
+        }}
       />
       <Stack.Screen
         name="PhoneVerification"
