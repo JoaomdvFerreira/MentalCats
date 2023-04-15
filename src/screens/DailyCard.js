@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, Image, TouchableOpacity, Share } from 'react-native';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 
 import { dailyCardStyles } from '../styles/dailyCardStyles';
 
@@ -11,7 +12,10 @@ import {
 } from '../utils/firebaseApi';
 import { generateDailyCard } from '../utils/dailyCardGenerator';
 
-import Ionicons from 'react-native-vector-icons/Ionicons';
+import Grid from '../assets/Grid.svg';
+import Ellipses from '../assets/Ellipses.svg';
+import PhotoEllipse from '../utils/PhotoEllipse';
+import MaskedView from '@react-native-community/masked-view';
 
 const DailyCard = ({ navigation }) => {
   const [card, setCard] = useState(null);
@@ -84,11 +88,20 @@ const DailyCard = ({ navigation }) => {
     <>
       <View style={dailyCardStyles.container}>
         <View style={dailyCardStyles.card}>
-          <View style={dailyCardStyles.imageContainer}>
+          <View style={dailyCardStyles.grid}>
+            <Grid width={395} height={395} />
+          </View>
+          <MaskedView
+            style={dailyCardStyles.imageContainer}
+            maskElement={<PhotoEllipse />}
+          >
             <Image
               source={{ uri: card.image.uri }}
               style={dailyCardStyles.image}
             />
+          </MaskedView>
+          <View style={dailyCardStyles.ellipses}>
+            <Ellipses width={120} height={33} />
           </View>
           <View>
             <Text style={dailyCardStyles.messageTitle}>
@@ -100,7 +113,6 @@ const DailyCard = ({ navigation }) => {
             Photo by Jeremy Bishop on Unsplash
           </Text>
         </View>
-
         <TouchableOpacity onPress={saveToFavorites}>
           <Ionicons name="heart-outline" size={24} color="#00f" />
         </TouchableOpacity>
