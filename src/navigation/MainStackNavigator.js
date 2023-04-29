@@ -26,8 +26,9 @@ const MainStackNavigator = ({ user }) => {
         name="DailyCard"
         component={DailyCard}
         options={{
-          title: 'Daily Card',
-          headerLeft: () => (user ? null : undefined),
+          // title: 'Daily Card',
+          // headerLeft: () => (user ? null : undefined),
+          headerShown: false,
         }}
       />
       <Stack.Screen

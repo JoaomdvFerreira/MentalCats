@@ -12,10 +12,8 @@ import {
 } from '../utils/firebaseApi';
 import { generateDailyCard } from '../utils/dailyCardGenerator';
 
-import Grid from '../assets/Grid.svg';
-import Ellipses from '../assets/Ellipses.svg';
-import PhotoEllipse from '../utils/PhotoEllipse';
-import MaskedView from '@react-native-community/masked-view';
+import Star from '../components/svg/Star';
+import CustomCardBackground from '../components/svg/CustomCardBackground';
 
 const DailyCard = ({ navigation }) => {
   const [card, setCard] = useState(null);
@@ -89,32 +87,20 @@ const DailyCard = ({ navigation }) => {
       <View style={dailyCardStyles.container}>
         <View style={dailyCardStyles.card}>
           <View style={dailyCardStyles.grid}>
-            <Grid width={395} height={395} />
+            <CustomCardBackground imageUrl={card.image.uri} />
+            <Star style={dailyCardStyles.star} />
           </View>
-          <MaskedView
-            style={dailyCardStyles.imageContainer}
-            maskElement={<PhotoEllipse />}
-          >
-            <Image
-              source={{ uri: card.image.uri }}
-              style={dailyCardStyles.image}
-            />
-          </MaskedView>
-          <View style={dailyCardStyles.ellipses}>
-            <Ellipses width={120} height={33} />
-          </View>
-          <View>
-            <Text style={dailyCardStyles.messageTitle}>
-              {card.message.title}
-            </Text>
-            <Text style={dailyCardStyles.message}>{card.message.message}</Text>
-          </View>
-          <Text style={dailyCardStyles.photoOwner}>
-            Photo by Jeremy Bishop on Unsplash
-          </Text>
         </View>
-        <TouchableOpacity onPress={saveToFavorites}>
-          <Ionicons name="heart-outline" size={24} color="#00f" />
+        <Text style={dailyCardStyles.title}>{card.message.title}</Text>
+        <Text style={dailyCardStyles.message}>{card.message.message}</Text>
+        <Text style={dailyCardStyles.photoOwner}>
+          Photo by Jeremy Bishop on Unsplash
+        </Text>
+        <TouchableOpacity
+          onPress={saveToFavorites}
+          style={dailyCardStyles.favoriteButton}
+        >
+          <Ionicons name="heart-outline" size={32} color="#000" />
         </TouchableOpacity>
       </View>
     </>
