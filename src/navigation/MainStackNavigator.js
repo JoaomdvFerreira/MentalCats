@@ -6,6 +6,7 @@ import DailyCard from '../screens/DailyCard';
 import PhoneVerification from '../screens/PhoneVerifications';
 import Favorites from '../screens/Favorites';
 import Detail from '../screens/Detail';
+import DailyCardHeader from '../components/DailyCardHeader';
 
 const Stack = createStackNavigator();
 
@@ -26,11 +27,13 @@ const MainStackNavigator = ({ user }) => {
         name="DailyCard"
         component={DailyCard}
         options={{
-          // title: 'Daily Card',
-          // headerLeft: () => (user ? null : undefined),
-          headerShown: false,
+          headerShown: true,
+          headerTransparent: true,
+          headerTitle: '',
+          header: (props) => <DailyCardHeader {...props} />,
         }}
       />
+
       <Stack.Screen
         name="PhoneVerification"
         component={PhoneVerification}
@@ -44,7 +47,11 @@ const MainStackNavigator = ({ user }) => {
       <Stack.Screen
         name="Detail"
         component={Detail}
-        options={{ title: 'Detail Card' }}
+        options={{
+          headerShown: true,
+          headerTransparent: true,
+          headerTitle: 'Detail Card',
+        }}
       />
     </Stack.Navigator>
   );

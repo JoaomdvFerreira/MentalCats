@@ -8,7 +8,7 @@ export const dailyCardStyles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: 'white',
-    paddingHorizontal: 30,
+    paddingHorizontal: 25,
     backgroundColor: '#F39201',
   },
   card: {
@@ -18,6 +18,7 @@ export const dailyCardStyles = StyleSheet.create({
     alignItems: 'center',
     overflow: 'hidden',
     marginBottom: 20,
+    marginTop: 40,
   },
   star: {
     position: 'absolute',

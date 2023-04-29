@@ -1,12 +1,6 @@
 import React from 'react';
-import {
-  View,
-  Text,
-  Image,
-  StyleSheet,
-  TouchableOpacity,
-  Share,
-} from 'react-native';
+import { View, Text, Image, TouchableOpacity, Share } from 'react-native';
+import { detailStyles } from '../styles/detailStyles';
 
 const Detail = ({ route }) => {
   const { card } = route.params;
@@ -23,37 +17,15 @@ const Detail = ({ route }) => {
   };
 
   return (
-    <View style={styles.container}>
-      <Image source={{ uri: card.image.uri }} style={styles.image} />
-      <Text style={styles.message}>{card.message.title}</Text>
-      <Text style={styles.message}>{card.message.message}</Text>
-      <TouchableOpacity style={styles.button} onPress={shareImage}>
-        <Text style={styles.buttonText}>Share</Text>
+    <View style={detailStyles.container}>
+      <Image source={{ uri: card.image.uri }} style={detailStyles.image} />
+      <Text style={detailStyles.title}>{card.message.title}</Text>
+      <Text style={detailStyles.message}>{card.message.message}</Text>
+      <TouchableOpacity style={detailStyles.button} onPress={shareImage}>
+        <Text style={detailStyles.buttonText}>Share</Text>
       </TouchableOpacity>
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 20,
-  },
-  image: { width: '100%', height: 300, resizeMode: 'cover', marginBottom: 20 },
-  message: { fontSize: 18, textAlign: 'center', marginBottom: 20 },
-  button: {
-    backgroundColor: '#007AFF',
-    paddingHorizontal: 20,
-    paddingVertical: 10,
-    borderRadius: 5,
-    marginVertical: 5,
-  },
-  buttonText: {
-    color: '#fff',
-    fontWeight: 'bold',
-  },
-});
 
 export default Detail;

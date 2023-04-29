@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, Image, TouchableOpacity, Share } from 'react-native';
+import { View, Text, TouchableOpacity } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
 import { dailyCardStyles } from '../styles/dailyCardStyles';
@@ -17,6 +17,7 @@ import CustomCardBackground from '../components/svg/CustomCardBackground';
 
 const DailyCard = ({ navigation }) => {
   const [card, setCard] = useState(null);
+  const [isFavorited, setIsFavorited] = useState(false);
   const [catImages, setCatImages] = useState([]);
   const [psychologicalMessages, setPsychologicalMessages] = useState([]);
 
@@ -37,6 +38,25 @@ const DailyCard = ({ navigation }) => {
 
     initializeData();
   }, []);
+
+  useEffect(() => {
+    const checkFavoriteStatus = async () => {
+      if (card) {
+        try {
+          const favorites =
+            JSON.parse(await AsyncStorage.getItem('favorites')) || [];
+          const isCardFavorited = favorites.some(
+            (favorite) => favorite.image.uri === card.image.uri
+          );
+          setIsFavorited(isCardFavorited);
+        } catch (err) {
+          console.error('Error checking card favorite status:', err);
+        }
+      }
+    };
+
+    checkFavoriteStatus();
+  }, [card]);
 
   useEffect(() => {
     if (catImages.length > 0 && psychologicalMessages.length > 0) {
@@ -60,20 +80,31 @@ const DailyCard = ({ navigation }) => {
     }
   }, [catImages, psychologicalMessages]);
 
-  const saveToFavorites = async () => {
+  const toggleFavorite = async () => {
     if (!card) return;
 
     try {
       const favorites =
         JSON.parse(await AsyncStorage.getItem('favorites')) || [];
-      favorites.push(card);
-      await AsyncStorage.setItem('favorites', JSON.stringify(favorites));
-      navigation.navigate('Favorites');
+
+      if (isFavorited) {
+        const updatedFavorites = favorites.filter(
+          (favorite) => favorite.image.uri !== card.image.uri
+        );
+        await AsyncStorage.setItem(
+          'favorites',
+          JSON.stringify(updatedFavorites)
+        );
+      } else {
+        favorites.push(card);
+        await AsyncStorage.setItem('favorites', JSON.stringify(favorites));
+      }
+
+      setIsFavorited(!isFavorited);
     } catch (err) {
-      console.error('Error saving card to favorites:', err);
+      console.error('Error toggling card favorite status:', err);
     }
   };
-
   if (!card) {
     return (
       <View style={dailyCardStyles.container}>
@@ -97,10 +128,14 @@ const DailyCard = ({ navigation }) => {
           Photo by Jeremy Bishop on Unsplash
         </Text>
         <TouchableOpacity
-          onPress={saveToFavorites}
+          onPress={toggleFavorite}
           style={dailyCardStyles.favoriteButton}
         >
-          <Ionicons name="heart-outline" size={32} color="#000" />
+          <Ionicons
+            name={isFavorited ? 'heart' : 'heart-outline'}
+            size={32}
+            color={isFavorited ? 'red' : '#000'}
+          />
         </TouchableOpacity>
       </View>
     </>
