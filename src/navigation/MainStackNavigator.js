@@ -26,12 +26,12 @@ const MainStackNavigator = ({ user }) => {
       <Stack.Screen
         name="DailyCard"
         component={DailyCard}
-        options={{
+        options={({ navigation }) => ({
           headerShown: true,
           headerTransparent: true,
           headerTitle: '',
-          header: (props) => <DailyCardHeader {...props} />,
-        }}
+          header: (props) => <DailyCardHeader navigation={navigation} />,
+        })}
       />
 
       <Stack.Screen

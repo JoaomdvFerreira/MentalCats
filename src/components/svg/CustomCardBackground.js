@@ -1,7 +1,12 @@
 import React from 'react';
 import Svg, { Rect, Image, Mask, Path } from 'react-native-svg';
 
-const CustomCardBackground = ({ width = 320, height = 425, imageUrl }) => {
+const CustomCardBackground = ({
+  width = 320,
+  height = 425,
+  imageUrl,
+  cardBackgroundColor,
+}) => {
   return (
     <Svg width={width} height={height} viewBox="0 0 319 416" fill="none">
       <Mask id="mask0" maskUnits="userSpaceOnUse">
@@ -11,7 +16,7 @@ const CustomCardBackground = ({ width = 320, height = 425, imageUrl }) => {
           width="272"
           height="375"
           transform="rotate(1.00079 28.2581 1.601)"
-          fill="#FDEB01"
+          fill="#ffffff"
         />
       </Mask>
       <Rect
@@ -20,7 +25,7 @@ const CustomCardBackground = ({ width = 320, height = 425, imageUrl }) => {
         width="275"
         height="378"
         transform="rotate(4.00079 43.7179 19)"
-        fill="#FDEB01"
+        fill={cardBackgroundColor}
       />
       <Image
         x="28.2581"

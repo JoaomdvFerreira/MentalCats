@@ -71,7 +71,7 @@ const Favorites = ({ navigation }) => {
   };
 
   const goToDetail = (card) => {
-    navigation.navigate('Detail', { card });
+    navigation.navigate('Detail', { card, colors: card.colors });
   };
   return (
     <View style={styles.container}>

@@ -9,7 +9,6 @@ export const detailStyles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: 'white',
     paddingHorizontal: 25,
-    backgroundColor: '#F39201',
   },
   image: {
     width: '100%',

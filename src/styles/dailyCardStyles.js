@@ -9,7 +9,6 @@ export const dailyCardStyles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: 'white',
     paddingHorizontal: 25,
-    backgroundColor: '#F39201',
   },
   card: {
     width: '100%',

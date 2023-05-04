@@ -21,6 +21,24 @@ const DailyCard = ({ navigation }) => {
   const [catImages, setCatImages] = useState([]);
   const [psychologicalMessages, setPsychologicalMessages] = useState([]);
 
+  const colorPairs = [
+    { background: '#01F383', cardBackground: '#F184BD' },
+    { background: '#F184BD', cardBackground: '#FDEB01' },
+    { background: '#FDEB01', cardBackground: '#F184BD' },
+    { background: '#F39201', cardBackground: '#FDEB01' },
+  ];
+
+  const getRandomColorPair = () => {
+    const randomIndex = Math.floor(Math.random() * colorPairs.length);
+    return colorPairs[randomIndex];
+  };
+
+  const [colors, setColors] = useState(getRandomColorPair());
+
+  useEffect(() => {
+    setColors(getRandomColorPair());
+  }, []);
+
   useEffect(() => {
     const initializeData = async () => {
       try {
@@ -96,7 +114,14 @@ const DailyCard = ({ navigation }) => {
           JSON.stringify(updatedFavorites)
         );
       } else {
-        favorites.push(card);
+        const cardWithColor = {
+          ...card,
+          colors: {
+            background: colors.background,
+            cardBackground: colors.cardBackground,
+          },
+        };
+        favorites.push(cardWithColor);
         await AsyncStorage.setItem('favorites', JSON.stringify(favorites));
       }
 
@@ -105,6 +130,7 @@ const DailyCard = ({ navigation }) => {
       console.error('Error toggling card favorite status:', err);
     }
   };
+
   if (!card) {
     return (
       <View style={dailyCardStyles.container}>
@@ -115,10 +141,18 @@ const DailyCard = ({ navigation }) => {
 
   return (
     <>
-      <View style={dailyCardStyles.container}>
+      <View
+        style={[
+          dailyCardStyles.container,
+          { backgroundColor: colors.background },
+        ]}
+      >
         <View style={dailyCardStyles.card}>
           <View style={dailyCardStyles.grid}>
-            <CustomCardBackground imageUrl={card.image.uri} />
+            <CustomCardBackground
+              imageUrl={card.image.uri}
+              cardBackgroundColor={colors.cardBackground}
+            />
             <Star style={dailyCardStyles.star} />
           </View>
         </View>
